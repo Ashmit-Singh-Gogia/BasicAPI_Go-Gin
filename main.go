@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +19,12 @@ var books = []Book{
 	{ID: "3", Title: "To Kill a Mockingbird", Author: "Harper Lee", Quantity: 2},
 }
 
+func getBooks(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, books)
+}
+
 func main() {
 	router := gin.Default()
+	router.GET("/books", getBooks)
+	router.Run(":8080")
 }
