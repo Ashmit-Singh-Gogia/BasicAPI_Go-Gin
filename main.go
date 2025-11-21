@@ -44,6 +44,21 @@ func createBook(c *gin.Context) {
 	books = append(books, newBook)
 	c.IndentedJSON(http.StatusOK, newBook)
 }
+
+func returnBook(c *gin.Context) {
+	id := c.Query("id")
+	for i := range books {
+		if books[i].ID == id {
+			books[i].Quantity += 1
+			c.IndentedJSON(http.StatusOK, books[i])
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{
+		"error": "Book not found",
+	})
+}
+
 func checkOut(c *gin.Context) {
 	id := c.Query("id")
 	for i := range books {
@@ -61,7 +76,8 @@ func main() {
 	router := gin.Default()
 	router.GET("/books", getBooks)
 	router.GET("/books/:id", getBookById)
-	router.GET("/books/checkout", checkOut)
+	router.PATCH("/books/checkout", checkOut)
+	router.PATCH("/books/return", returnBook)
 	router.POST("/books", createBook)
 	router.Run(":8080")
 }
