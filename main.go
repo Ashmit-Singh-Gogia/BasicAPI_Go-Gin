@@ -19,6 +19,19 @@ var books = []Book{
 	{ID: "3", Title: "To Kill a Mockingbird", Author: "Harper Lee", Quantity: 2},
 }
 
+func getBookById(c *gin.Context) {
+	id := c.Param("id")
+	for _, book := range books {
+		if book.ID == id {
+			c.IndentedJSON(http.StatusOK, book)
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{
+		"error": "Book with id not found",
+	})
+}
+
 func getBooks(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, books)
 }
@@ -35,5 +48,6 @@ func main() {
 	router := gin.Default()
 	router.GET("/books", getBooks)
 	router.POST("/books", createBook)
+	router.GET("/books/:id", getBookById)
 	router.Run(":8080")
 }
