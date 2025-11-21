@@ -21,9 +21,9 @@ var books = []Book{
 
 func getBookById(c *gin.Context) {
 	id := c.Param("id")
-	for _, book := range books {
-		if book.ID == id {
-			c.IndentedJSON(http.StatusOK, book)
+	for i := range books {
+		if books[i].ID == id {
+			c.IndentedJSON(http.StatusOK, books[i])
 			return
 		}
 	}
@@ -44,10 +44,24 @@ func createBook(c *gin.Context) {
 	books = append(books, newBook)
 	c.IndentedJSON(http.StatusOK, newBook)
 }
+func checkOut(c *gin.Context) {
+	id := c.Query("id")
+	for i := range books {
+		if books[i].ID == id && books[i].Quantity > 0 {
+			books[i].Quantity -= 1
+			c.IndentedJSON(http.StatusOK, books[i])
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{
+		"error": "Book not found or out of stock",
+	})
+}
 func main() {
 	router := gin.Default()
 	router.GET("/books", getBooks)
-	router.POST("/books", createBook)
 	router.GET("/books/:id", getBookById)
+	router.GET("/books/checkout", checkOut)
+	router.POST("/books", createBook)
 	router.Run(":8080")
 }
